@@ -25,43 +25,50 @@ public class NeuralNetwork {
 
     for(int i = 0; i < weightsArray1.Length; i++) {
       weights.Add(
-          Matrix.Build.Random(
-            weightsArray2[i], weightsArray1[i] + 1
-          ) * 0.1f
-        );
+        Matrix.Build.Random(
+          weightsArray2[i], weightsArray1[i] + 1
+        ) * 0.1f
+      );
     }
   }
 
-  public void MatrixTesting() {
-    Vector inputVector = Vector.Build.DenseOfEnumerable(
-      new List<double> { 1.0, 1.0 }
-    );
-
-    Matrix matrix = Matrix.Build.DenseOfMatrixArray(
-      new Matrix[,] {{
-        inputVector.ToColumnMatrix(),
-        Matrix.Build.Dense(1, 2, 1.0)
-      }}
-    );
-    Debug.Log(inputVector.ToColumnMatrix());
-    Debug.Log(Matrix.Build.Dense(1, 2, 1.0));
-    Debug.Log(matrix);
-  }
-
-  public void Run(List<double> input) {
+  public List<double> Run(List<double> input) {
     Vector inputVector = Vector.Build.DenseOfEnumerable(input);
     int inputsCount = input.Count;
 
+    _layerInput = new List<Matrix>();
+    _layerOutput = new List<Matrix>();
+
+    Matrix layerInput;
     for(int i = 0; i < layerCount; i++) {
       if(i == 0) {
-        Matrix layerInput = weights[0] * Matrix.Build.DenseOfMatrixArray(
-          new Matrix[,] {{
-            inputVector.ToColumnMatrix(),
-            Matrix.Build.Dense(1, inputsCount, 1.0)
-          }}
-        );
+        Matrix columnMatrix = inputVector.ToRowMatrix();
+        Matrix biasNode = Matrix.Build.Dense(1, 1, 1.0);
+        layerInput = weights[0] * columnMatrix.Append(biasNode).Transpose();
+      } else {
+        Matrix columnMatrix = _layerOutput[_layerOutput.Count - 1].Transpose();
+        Matrix biasNode = Matrix.Build.Dense(1, 1, 1.0);
+        layerInput = weights[i] * columnMatrix.Append(biasNode).Transpose();
       }
+
+      Matrix layerOutput = Matrix.Build.Dense(layerInput.RowCount, layerInput.ColumnCount);
+      layerInput.CopyTo(layerOutput);
+      IEnumerator<Vector> layerInputValues = (IEnumerator<Vector>)layerInput.EnumerateRows();
+      int row = 0;
+      while(layerInputValues.MoveNext()) {
+        Vector vec = layerInputValues.Current;
+        for(int col = 0;col < vec.Count; col++) {
+          layerOutput[row, col] = Sigmoid(layerInput[row, col]);
+        }
+      }
+
+      _layerInput.Add(layerInput);
+      _layerOutput.Add(layerOutput);
     }
+
+    return new List<double>(
+      _layerOutput[_layerOutput.Count - 1].Enumerate()
+    );
   }
 
   public double Sigmoid(double x, bool derivative = false) {

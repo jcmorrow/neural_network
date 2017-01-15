@@ -8,11 +8,10 @@ class NeuralNetworkTest {
 
   [Test]
   public void NeuralNetwork_Sigmoid_ReturnsSigmoid() {
-    new NeuralNetwork(new List<int> {2, 3, 2});
-  }
-
-  [Test]
-  public void NeuralNetwork_MatrixTesting_Test() {
-    new NeuralNetwork(new List<int> {2, 3, 2}).MatrixTesting();
+    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
+    List<double> result = nn.Run(new List<double> { 1, 1 });
+    foreach(double i in result) {
+      Debug.Log(i);
+    }
   }
 }
