@@ -34,7 +34,7 @@ class NeuralNetworkTest {
 
   [Test]
   public void NeuralNetwork_Train_RunsSmoothly() {
-    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
+    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 2, 1});
     double[,] input = new double[,] {
       { 1, 1 },
       { 0, 0 },
@@ -43,13 +43,15 @@ class NeuralNetworkTest {
     };
 
     double[,] target = new double[,] {
-      {1, 0},
-      {1, 0},
-      {0, 1},
-      {0, 1}
+      {.95},
+      {.95},
+      {0.05},
+      {0.05}
     };
 
-    nn.Train(input, target);
+    double error = nn.Train(input, target);
+
+    Debug.Log(error);
   }
 
   [Test]
@@ -59,5 +61,43 @@ class NeuralNetworkTest {
     double result = nn.Sigmoid(0);
 
     Assert.AreEqual(.5, result);
+  }
+
+  [Test]
+  public void NeuralNetwork_TransposeArrayTest() {
+    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
+
+    double[,] test = new double[,] {
+      { 1, 1 },
+      { 2, 2 },
+      { 3, 3 }
+    };
+
+    double [,,] correct = new double[,,] {
+      { {1, 1} },
+      { {2, 2} },
+      { {3, 3} },
+    };
+
+    Assert.AreEqual(correct, nn.DeltaTranspose(test));
+  }
+
+  [Test]
+  public void NeuralNetwork_TransposeOutputArrayTest() {
+    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
+
+    double[,] test = new double[,] {
+      { 1, 1 },
+      { 2, 2 },
+      { 3, 3 }
+    };
+
+    double [,,] correct = new double[,,] {
+      { {1}, {1} },
+      { {2}, {2} },
+      { {3}, {3} },
+    };
+
+    Assert.AreEqual(correct, nn.OutputTranspose(test));
   }
 }
