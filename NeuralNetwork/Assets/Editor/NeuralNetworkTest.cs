@@ -100,4 +100,21 @@ class NeuralNetworkTest {
 
     Assert.AreEqual(correct, nn.OutputTranspose(test));
   }
+
+
+  [Test]
+  public void NeuralNetwork_SumAcrossZeroTest() {
+    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
+
+    double [,,] test = new double[,,] {
+      { {1}, {1} },
+      { {2}, {2} },
+      { {3}, {3} },
+    };
+    double[,] correct = new double[,] {{6}, {6}};
+
+    double[,] result = nn.SumAcrossZero(test);
+
+    Assert.AreEqual(correct, result);
+  }
 }

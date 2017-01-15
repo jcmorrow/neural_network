@@ -109,22 +109,35 @@ public class NeuralNetwork {
       double[,,] layerOutputOtherThing = new double[,,] {{{}}};
 
       Debug.Log(layerOutput);
-
-      // np.sum doesn't exist. What we want to do is sum these across the 0th
-      // axis
-       weightDelta = np.sum(
-         OutputTranspose(layerOutput) * DeltaTranspose(delta[deltaIndex])
-       );
+      Debug.Log(delta[deltaIndex]);
+      SumAcrossZero(
+        Matrix.Build.DenseOfArray(
+          OutputTranspose(layerOutput.ToArray())
+        ) * Matrix.Build.DenseOfArray(
+          DeltaTranspose(delta[deltaIndex].ToArray())
+        )
+      );
     }
 
     return error;
+  }
+
+  public double[,] SumAcrossZero(double[,,] toSum) {
+    double[,] result = new double[toSum.GetLength(1),toSum.GetLength(2)];
+    for(int layer = 0; layer < toSum.GetLength(0); layer++) {
+      for(int row = 0; row < toSum.GetLength(1); row++) {
+        for(int column = 0; column < toSum.GetLength(2); column++) {
+          result[row, column] += toSum[layer, row, column];
+        }
+      }
+    }
+    return result;
   }
 
   public double[,,] DeltaTranspose(double[,] toTranspose) {
     double[,,] result = new double[toTranspose.GetLength(0), 1, toTranspose.GetLength(1)];
     for(int row = 0; row < toTranspose.GetLength(0); row++) {
       for(int column = 0; column < toTranspose.GetLength(1); column++) {
-        Debug.Log(toTranspose[row, column]);
         result[row, 0, column] = toTranspose[row, column];
       }
     }
@@ -136,7 +149,6 @@ public class NeuralNetwork {
     double[,,] result = new double[toTranspose.GetLength(0), toTranspose.GetLength(1), 1];
     for(int row = 0; row < toTranspose.GetLength(0); row++) {
       for(int column = 0; column < toTranspose.GetLength(1); column++) {
-        Debug.Log(toTranspose[row, column]);
         result[row, column, 0] = toTranspose[row, column];
       }
     }
