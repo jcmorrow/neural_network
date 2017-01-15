@@ -27,7 +27,7 @@ public class NeuralNetwork {
       weights.Add(
         Matrix.Build.Random(
           weightsArray2[i], weightsArray1[i] + 1
-        ) * 0.1f
+        ) * 0.01f
       );
     }
   }
@@ -51,13 +51,12 @@ public class NeuralNetwork {
         layerInput = weights[i] * columnMatrix.Append(biasNode).Transpose();
       }
 
-      Matrix layerOutput = Matrix.Build.Dense(layerInput.RowCount, layerInput.ColumnCount);
-      layerInput.CopyTo(layerOutput);
-      IEnumerator<Vector> layerInputValues = (IEnumerator<Vector>)layerInput.EnumerateRows();
-      int row = 0;
-      while(layerInputValues.MoveNext()) {
-        Vector vec = layerInputValues.Current;
-        for(int col = 0;col < vec.Count; col++) {
+      Matrix layerOutput = Matrix.Build.Dense(
+        layerInput.RowCount,
+        layerInput.ColumnCount
+      );
+      for(int row = 0; row < layerInput.RowCount; row ++) {
+        for(int col = 0;col < layerInput.ColumnCount; col++) {
           layerOutput[row, col] = Sigmoid(layerInput[row, col]);
         }
       }
