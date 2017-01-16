@@ -7,11 +7,11 @@ using NUnit.Framework;
 class BackPropogationNetworkTest {
   [Test]
   public void BackPropogationNetwork_Init_Runs() {
-    BackPropogationNetwork bpn = new BackPropogationNetwork();
+    // BackPropogationNetwork bpn = new BackPropogationNetwork();
   }
 
   [Test]
   public void BackPropogationNetwork_Sigmoid_ReturnsLow() {
-    BackPropogationNetwork network = new BackPropogationNetwork();
+    // BackPropogationNetwork network = new BackPropogationNetwork();
   }
 }

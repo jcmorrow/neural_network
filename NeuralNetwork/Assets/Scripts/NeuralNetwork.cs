@@ -108,15 +108,13 @@ public class NeuralNetwork {
       double[,] layerOutputArray = layerOutput.ToArray();
       double[,,] layerOutputOtherThing = new double[,,] {{{}}};
 
-      Debug.Log(layerOutput);
-      Debug.Log(delta[deltaIndex]);
-      SumAcrossZero(
-        Matrix.Build.DenseOfArray(
-          OutputTranspose(layerOutput.ToArray())
-        ) * Matrix.Build.DenseOfArray(
-          DeltaTranspose(delta[deltaIndex].ToArray())
-        )
-      );
+      // SumAcrossZero(
+      //   Matrix.Build.DenseOfArray(
+      //     OutputTranspose(layerOutput.ToArray())
+      //   ) * Matrix.Build.DenseOfArray(
+      //     DeltaTranspose(delta[deltaIndex].ToArray())
+      //   )
+      // );
     }
 
     return error;

@@ -9,7 +9,7 @@ public enum TransferFunction
 }
 
 static class TransferFunctions {
-  public double Evaluate(TransferFunction tFunc, double input) {
+  public static double Evaluate(TransferFunction tFunc, double input) {
     switch(tFunc)
     {
       case TransferFunction.Sigmoid:
@@ -19,7 +19,7 @@ static class TransferFunctions {
         return input;
     }
   }
-  public double EvaluateDerivative(TransferFunction tFunc, double input) {
+  public static double EvaluateDerivative(TransferFunction tFunc, double input) {
     switch(tFunc)
     {
       case TransferFunction.Sigmoid:
@@ -30,8 +30,8 @@ static class TransferFunctions {
     }
   }
 
-  public double sigmoid(double x) { return 1.0 / (1.0 + Math.Exp(-x)); }
-  public double sigmoid_derivative(double x) {
+  public static double sigmoid(double x) { return 1.0 / (1.0 + Math.Exp(-x)); }
+  public static double sigmoid_derivative(double x) {
     double sigmoid_x = sigmoid(x);
     return sigmoid_x * (1 - sigmoid_x);
   }
@@ -57,7 +57,7 @@ public class BackPropogationNetwork{
     if(transferFunctions.Length != layerSizes.Length) {
       throw new ArgumentException("Fuck");
     }
-    if(transferFunctions[0] != TransferFunctions.None) {
+    if(transferFunctions[0] != TransferFunction.None) {
       throw new ArgumentException("Fuck");
     }
 
@@ -68,7 +68,7 @@ public class BackPropogationNetwork{
       layerSize[i] = layerSizes[i + 1];
     }
 
-    transferFunction = new TransferFunction(layerCount);
+    transferFunction = new TransferFunction[layerCount];
 
     for(int i = 0; i < layerCount; i++) {
       transferFunction[i] = transferFunctions[i + 1];
@@ -98,6 +98,54 @@ public class BackPropogationNetwork{
         previousWeightDelta[l][n] = new double[layerSize[l]];
       }
     }
+
+    for(int l = 0; l < layerCount; l++) {
+      for(int j = 0; j < layerSize[l]; j++) {
+        bias[l][j] = Gaussian.GetRandomGaussian();
+        previousBiasDelta[l][j] = 0.0;
+        layerOutput[l][j] = 0.0;
+        layerInput[l][j] = 0.0;
+        delta[l][j] = 0.0;
+      }
+
+      for(int i = 0; i < (l == 0 ? inputSize : layerSize[l - 1]); i++) {
+        for(int j = 0; j < layerSize[l]; j++) {
+          weight[l][i][j] = Gaussian.GetRandomGaussian();
+          previousWeightDelta[l][i][j] = 0.0;
+        }
+      }
+    }
+  }
+}
+
+public static class Gaussian {
+  private static System.Random gen = new System.Random();
+
+  public static double GetRandomGaussian() {
+    return GetRandomGaussian(0.0, 1.0);
+  }
+
+  public static double GetRandomGaussian(double mean, double stddev) {
+    double rVal1, rVal2;
+
+    GetRandomGaussian(mean, stddev, out rVal1, out rVal2);
+
+    return rVal1;
+  }
+
+  public static void GetRandomGaussian(double mean, double stddev, out double val1, out double val2) {
+    double u, v, s, t;
+
+    do{
+      u = 2 * gen.NextDouble() - 1;
+      v = 2 * gen.NextDouble() - 1;
+    } while (u * u + v * v > 1 || (u == 0 && v == 0));
+
+    s = u * u + v * v;
+    t = Math.Sqrt((-2.0 * Math.Log(s)) / s);
+
+    val1 = stddev * u * t + mean;
+    val2 = stddev * v * t + mean;
   }
 }
 
