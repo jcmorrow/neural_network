@@ -63,10 +63,12 @@ public class BackPropogationNetwork{
 
     layerCount = layerSizes.Length - 1;
     layerSize = new int[layerCount];
+    inputSize = layerSizes[0];
 
     for(int i = 0; i < layerCount; i++) {
       layerSize[i] = layerSizes[i + 1];
     }
+
 
     transferFunction = new TransferFunction[layerCount];
 
@@ -115,6 +117,103 @@ public class BackPropogationNetwork{
         }
       }
     }
+  }
+
+  public void Run(ref double[] input, out double[] output) {
+    if(input.Length != inputSize) {
+      throw new ArgumentException(
+        "Input data is not of the correct dimensions"
+      );
+    }
+
+    output = new double[layerSize[layerCount - 1]];
+
+    for (int l = 0; l < layerCount; l++) {
+      for(int j = 0; j < layerSize[l]; j++) {
+        double nodeInput = 0;
+        for(int i = 0; i < (l == 0 ? inputSize : layerSize[l - 1]);i++) {
+          nodeInput += weight[l][i][j] * (l == 0 ? input[i] : layerOutput[l - 1][i]);
+          nodeInput += bias[l][j];
+
+          layerInput[l][j] = nodeInput;
+          layerOutput[l][j] = TransferFunctions.Evaluate(
+            transferFunction[l],
+            nodeInput
+          );
+        }
+      }
+    }
+
+    for(int i = 0; i < layerSize[layerCount - 1]; i++) {
+      output[i] = layerOutput[layerCount - 1][i];
+    }
+  }
+
+  public double Train(ref double[] input, ref double[] target, double TrainingRate, double Momentum) {
+    if(input.Length != inputSize) {
+      throw new ArgumentException("Invalid input size", "input");
+    }
+    if(target.Length != layerSize[layerCount - 1]) {
+      throw new ArgumentException("Invalid output parameter", "target");
+    }
+
+    double error = 0.0;
+    double sum = 0.0;
+    double weightDelta = 0.0;
+    double biasDelta = 0.0;
+    double[] output = new double[layerSize[layerCount - 1]];
+
+    Run(ref input, out output);
+
+    // back-propogation
+    for(int l = layerCount - 1; l >= 0; l--) {
+      if (l == layerCount -1) {
+        for(int k = 0; k < layerSize[l]; k++) {
+          delta[l][k] = output[k] - target[k];
+          error += Math.Pow(delta[l][k], 2);
+          delta[l][k] *= TransferFunctions.EvaluateDerivative(
+            transferFunction[l],
+            layerInput[l][k]
+          );
+        }
+      } else {
+        for(int i = 0; i < layerSize[l]; i++) {
+          sum = 0.0;
+          for(int j = 0; j < layerSize[l + 1]; j++) {
+            sum += weight[l + 1][i][j] * delta[l + 1][j];
+          }
+          sum *= TransferFunctions.EvaluateDerivative(
+            transferFunction[l],
+            layerInput[l][i]
+          );
+
+          delta[l][i] = sum;
+        }
+      }
+    }
+
+    for(int l = 0; l < layerCount; l++) {
+      for(int i = 0; i < (l == 0 ? inputSize : layerSize[l - 1]); i++) {
+        for(int j = 0; j < layerSize[l]; j++) {
+          weightDelta = TrainingRate * delta[l][j] * (
+            l == 0 ? input[i] : layerOutput[l - 1][i]
+          );
+          weight[l][i][j] -= weightDelta + Momentum * previousWeightDelta[l][i][j];
+          previousWeightDelta[l][i][j] = weightDelta;
+        }
+      }
+    }
+
+    for(int l = 0; l < layerCount; l++) {
+      for(int i = 0; i < layerSize[l]; i++) {
+        biasDelta = TrainingRate * delta[l][i];
+        bias[l][i] = biasDelta + Momentum * previousBiasDelta[l][i];
+
+        previousBiasDelta[l][i] = biasDelta;
+      }
+    }
+
+    return error;
   }
 }
 

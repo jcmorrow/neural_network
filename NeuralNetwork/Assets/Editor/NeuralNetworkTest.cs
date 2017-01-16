@@ -50,8 +50,6 @@ class NeuralNetworkTest {
     };
 
     double error = nn.Train(input, target);
-
-    Debug.Log(error);
   }
 
   [Test]
