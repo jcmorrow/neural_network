@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Editor\BackPropogationNetworkTest.cs" />
      <Compile Include="Assets\Editor\NeuralNetworkTest.cs" />
      <None Include="Assets\Plugins\MathNet.Numerics.xml" />
      <None Include="Assets\Plugins\System.Threading.xml" />
