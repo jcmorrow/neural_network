@@ -104,15 +104,12 @@ public class NeuralNetwork {
         Matrix biasNodes = Matrix.Build.Dense(1, previousLayerOutputs.ColumnCount, 1.0);
         layerOutput = previousLayerOutputs.Stack(biasNodes);
       }
-      Debug.Log(layerOutput);
-      Debug.Log(delta[deltaIndex]);
+      double[,,] transposedLayer = OutputTranspose(layerOutput.ToArray());
+      double[,,] transposedDelta = DeltaTranspose(delta[deltaIndex].ToArray());
+
       // SumAcrossZero(
-      //   Matrix.Build.DenseOfArray(
-      //     OutputTranspose(layerOutput.ToArray())
-      //   ).PointwiseMultiply(
-      //     Matrix.Build.DenseOfArray(
-      //       DeltaTranspose(delta[deltaIndex].ToArray())
-      //     )
+      //   Matrix.Build.DenseOfArray(transposedLayer).PointwiseMultiply(
+      //     Matrix.Build.DenseOfArray(transposedDelta)
       //   )
       // );
     }
@@ -133,10 +130,10 @@ public class NeuralNetwork {
   }
 
   public double[,,] DeltaTranspose(double[,] toTranspose) {
-    double[,,] result = new double[toTranspose.GetLength(0), 1, toTranspose.GetLength(1)];
+    double[,,] result = new double[toTranspose.GetLength(1), toTranspose.GetLength(0), 1];
     for(int row = 0; row < toTranspose.GetLength(0); row++) {
       for(int column = 0; column < toTranspose.GetLength(1); column++) {
-        result[row, 0, column] = toTranspose[row, column];
+        result[column, row, 0] = toTranspose[row, column];
       }
     }
 
@@ -144,10 +141,10 @@ public class NeuralNetwork {
   }
 
   public double[,,] OutputTranspose(double[,] toTranspose) {
-    double[,,] result = new double[toTranspose.GetLength(0), toTranspose.GetLength(1), 1];
-    for(int row = 0; row < toTranspose.GetLength(0); row++) {
-      for(int column = 0; column < toTranspose.GetLength(1); column++) {
-        result[row, column, 0] = toTranspose[row, column];
+    double[,,] result = new double[toTranspose.GetLength(1), 1, toTranspose.GetLength(0)];
+    for(int y = 0; y < toTranspose.GetLength(0); y++) {
+      for(int x = 0; x < toTranspose.GetLength(1); x++) {
+        result[x, 0, y] = toTranspose[y, x];
       }
     }
 

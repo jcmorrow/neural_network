@@ -36,17 +36,17 @@ class NeuralNetworkTest {
   public void NeuralNetwork_Train_RunsSmoothly() {
     NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 2, 1});
     double[,] input = new double[,] {
-      { 1, 1 },
       { 0, 0 },
-      { 1, 0 },
-      { 0, 1 }
+      { 1, 1 },
+      { 0, 1 },
+      { 1, 0 }
     };
 
     double[,] target = new double[,] {
-      {.95},
-      {.95},
       {0.05},
-      {0.05}
+      {0.05},
+      {.95},
+      {.95}
     };
 
     double error = nn.Train(input, target);
@@ -64,38 +64,40 @@ class NeuralNetworkTest {
   }
 
   [Test]
-  public void NeuralNetwork_TransposeArrayTest() {
+  public void NeuralNetwork_DeltaTranspose_Test() {
     NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
 
     double[,] test = new double[,] {
-      { 1, 1 },
-      { 2, 2 },
-      { 3, 3 }
-    };
-
-    double [,,] correct = new double[,,] {
-      { {1, 1} },
-      { {2, 2} },
-      { {3, 3} },
-    };
-
-    Assert.AreEqual(correct, nn.DeltaTranspose(test));
-  }
-
-  [Test]
-  public void NeuralNetwork_TransposeOutputArrayTest() {
-    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
-
-    double[,] test = new double[,] {
-      { 1, 1 },
-      { 2, 2 },
-      { 3, 3 }
+      { 1, 2, 3, 4 },
+      { 1, 2, 3, 4 }
     };
 
     double [,,] correct = new double[,,] {
       { {1}, {1} },
       { {2}, {2} },
       { {3}, {3} },
+      { {4}, {4} }
+    };
+
+    Assert.AreEqual(correct, nn.DeltaTranspose(test));
+  }
+
+  [Test]
+  public void NeuralNetwork_OutputTranspose_Test() {
+    NeuralNetwork nn = new NeuralNetwork(new List<int> {2, 3, 2});
+
+
+    double [,] test = new double[,] {
+      { 0, 1, 0, 1 },
+      { 0, 1, 1, 0 },
+      { 1, 1, 1, 1 },
+    };
+
+    double[,,] correct = new double[,,] {
+      {{ 0, 0, 1 }},
+      {{ 1, 1, 1 }},
+      {{ 0, 1, 1 }},
+      {{ 1, 0, 1 }}
     };
 
     Assert.AreEqual(correct, nn.OutputTranspose(test));
