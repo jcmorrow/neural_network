@@ -104,19 +104,17 @@ public class NeuralNetwork {
         Matrix biasNodes = Matrix.Build.Dense(1, previousLayerOutputs.ColumnCount, 1.0);
         layerOutput = previousLayerOutputs.Stack(biasNodes);
       }
-
-      double[,] layerOutputArray = layerOutput.ToArray();
-      double[,,] layerOutputOtherThing = new double[,,] {{{}}};
-
       Debug.Log(layerOutput);
       Debug.Log(delta[deltaIndex]);
-      SumAcrossZero(
-        Matrix.Build.DenseOfArray(
-          OutputTranspose(layerOutput.ToArray())
-        ) * Matrix.Build.DenseOfArray(
-          DeltaTranspose(delta[deltaIndex].ToArray())
-        )
-      );
+      // SumAcrossZero(
+      //   Matrix.Build.DenseOfArray(
+      //     OutputTranspose(layerOutput.ToArray())
+      //   ).PointwiseMultiply(
+      //     Matrix.Build.DenseOfArray(
+      //       DeltaTranspose(delta[deltaIndex].ToArray())
+      //     )
+      //   )
+      // );
     }
 
     return error;
